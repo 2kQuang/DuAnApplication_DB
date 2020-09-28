@@ -1,0 +1,208 @@
+﻿CREATE DATABASE QL_KhachSan
+GO
+
+USE QL_KhachSan
+GO
+
+CREATE TABLE Nhanvien
+(
+	ID_NV INT PRIMARY KEY,
+	Hoten NVARCHAR(50),
+	Dienthoai NVARCHAR(50),
+	Taikhoan NVARCHAR(12),
+	Matkhau NVARCHAR(12),
+	Loai TINYINT
+
+)
+GO
+CREATE TABLE Khachhang(
+	ID_KH INT PRIMARY KEY,
+	Hoten NVARCHAR(50),
+	Gioitinh TINYINT,
+	Donvi NVARCHAR(50),
+	SoCMND NVARCHAR(12),
+	Ngaycap DATE,
+	Noicap NVARCHAR(50),
+	Loai TINYINT,
+	Quoctoch NVARCHAR(20)
+)
+GO
+CREATE TABLE Dichvu(
+	ID_DV INT PRIMARY KEY,
+	TenDV NVARCHAR(50),
+	DVT NVARCHAR(7),
+	Dongia FLOAT,
+	Ghichu NVARCHAR(50),
+	Loai TINYINT,
+	SLDK FLOAT,
+	GTDK FLOAT
+)
+GO
+CREATE TABLE LoaiPhong(
+	ID_Loai INT PRIMARY KEY,
+	Tenloai NVARCHAR(20)
+
+)
+GO
+
+GO
+CREATE TABLE Phong(
+	Maphong NVARCHAR(10) PRIMARY KEY,
+	Tang TINYINT,
+	ID_Loai INT,
+	Dongia FLOAT,
+	Trangthai TINYINT,
+	Phone NVARCHAR(5),
+	Giuong TINYINT,
+	Nguoi TINYINT
+)
+GO
+CREATE TABLE TB_Phong(
+	ID_TB INT PRIMARY KEY,
+	Maphong NVARCHAR(10),
+	ID_DV INT,
+	Soluong INT,
+	Trangthai NVARCHAR(50),
+	SerialoNO VARBINARY(50)
+)
+GO
+CREATE TABLE QuanlyPhong(
+	ID_QL INT PRIMARY KEY,
+	ID_DK INT,
+	ID_KH INT,
+	Maphong NVARCHAR(10),
+	Check_in DATE,
+	Check_out DATE,
+	Gia FLOAT,
+	Phuthu FLOAT,
+	Ghichu NVARCHAR(MAX),
+	Status TINYINT
+)
+GO
+CREATE TABLE SudungDV(
+	ID_SD INT PRIMARY KEY,
+	ID_QL INT,
+	ID_DV INT,
+	ID_NV INT,
+	Soluong FLOAT,
+	Dongia FLOAT,
+	Ghichu NVARCHAR(50)
+)
+GO
+CREATE TABLE Dangky(
+	ID_DK INT PRIMARY KEY,
+	Sophong INT,
+	Ngaydat DATE,
+	Tungay DATE,
+	Denngay DATE,
+	Sokhach INT,
+	Nam INT,
+	TreEm INT,
+	ID_KH INT,
+	ID_NV INT,
+	Tiencoc FLOAT
+)
+GO
+CREATE TABLE ChungTu(
+	SoCT NVARCHAR(7) PRIMARY KEY,
+	NgayCT DATETIME,
+	Loai TINYINT,
+	ID_KH INT,
+	ID_NV INT,
+	Noidung NVARCHAR(225),
+	Giam FLOAT,
+	ThueVAT FLOAT,
+	Sohoadon NVARCHAR(20),
+	ID_QL INT
+)
+GO
+CREATE TABLE DongChungTu(
+	ID INT PRIMARY KEY,
+	SoCT NVARCHAR(7),
+	ID_DV INT,
+	Soluong FLOAT,
+	Dongia FLOAT,
+	Ghichu NVARCHAR(225)
+)
+
+GO
+
+ALTER TABLE dbo.Dangky ADD CONSTRAINT FK_DK_NV FOREIGN KEY (ID_NV) REFERENCES dbo.Nhanvien(ID_NV)
+GO
+ALTER TABLE dbo.ChungTu ADD CONSTRAINT FK_CT_NV FOREIGN KEY (ID_NV) REFERENCES dbo.Nhanvien(ID_NV)
+GO
+ALTER TABLE dbo.SudungDV ADD CONSTRAINT FK_SDDV_NV FOREIGN KEY (ID_DV) REFERENCES dbo.Nhanvien(ID_NV)
+GO
+ALTER TABLE dbo.Dangky ADD CONSTRAINT FK_DK_KH FOREIGN KEY (ID_DK) REFERENCES dbo.Khachhang(ID_KH)
+GO
+ALTER TABLE dbo.QuanlyPhong ADD CONSTRAINT FK_QLP_KH FOREIGN KEY (ID_KH) REFERENCES dbo.Khachhang(ID_KH)
+GO
+ALTER TABLE dbo.ChungTu ADD CONSTRAINT FK_CT_KH FOREIGN KEY (ID_KH) REFERENCES dbo.Khachhang(ID_KH)
+GO
+ALTER TABLE dbo.SudungDV ADD CONSTRAINT FK_SDDV_DV FOREIGN KEY (ID_DV) REFERENCES dbo.Dichvu(ID_DV)
+GO
+ALTER TABLE dbo.DongChungTu ADD CONSTRAINT FK_DCT_DV FOREIGN KEY (ID_DV) REFERENCES dbo.Dichvu(ID_DV)
+GO
+ALTER TABLE dbo.Phong ADD CONSTRAINT FK_P_LP FOREIGN KEY (ID_Loai) REFERENCES dbo.LoaiPhong(ID_Loai)
+GO
+ALTER TABLE dbo.TB_Phong ADD CONSTRAINT FK_TBP_P FOREIGN KEY (Maphong) REFERENCES dbo.Phong(Maphong)
+GO
+ALTER TABLE dbo.QuanlyPhong ADD CONSTRAINT FK_QLP_P FOREIGN KEY (Maphong) REFERENCES dbo.Phong(Maphong)
+GO
+ALTER TABLE dbo.QuanlyPhong ADD CONSTRAINT FK_QLP_DK FOREIGN KEY (ID_DK) REFERENCES dbo.Dangky(ID_DK)
+GO
+ALTER TABLE dbo.SudungDV ADD CONSTRAINT FK_SDDV_QLP FOREIGN KEY (ID_QL) REFERENCES dbo.QuanlyPhong(ID_QL)
+GO
+ALTER TABLE dbo.ChungTu ADD CONSTRAINT FK_CT_QLP FOREIGN KEY (ID_QL) REFERENCES dbo.QuanlyPhong(ID_QL)
+GO
+ALTER TABLE dbo.DongChungTu ADD CONSTRAINT FK_DCT_CT FOREIGN KEY (SoCT) REFERENCES dbo.ChungTu(SoCT)
+GO
+/*Nhập dữ liệu bảng LoaiPhong*/
+INSERT INTO dbo.LoaiPhong VALUES(   1, N'Phòng Thường' )
+GO
+INSERT INTO dbo.LoaiPhong VALUES(   2, N'Phòng Vip1' )
+GO
+INSERT INTO dbo.LoaiPhong VALUES(   3, N'Phòng Vip2' ) 
+GO
+INSERT INTO dbo.LoaiPhong VALUES(   4, N'Phòng Vip3' )
+GO
+INSERT INTO dbo.LoaiPhong VALUES(   5, N'Phòng Vip4' )
+/*Nhập dữ liệu cho bảng Nhân viên*/
+INSERT INTO dbo.Nhanvien VALUES(   1,N'Trần Văn Quang',N'0397391045',N'2kQuang',N'10072000',0)
+GO
+INSERT INTO dbo.Nhanvien VALUES(   2,N'Nguyễn Trọng Tài',N'0987654321',N'',N'',1)
+GO
+INSERT INTO dbo.Nhanvien VALUES(   3,N'Trương Vĩnh Kha',N'0123456789',N'',N'',2)
+GO
+INSERT INTO dbo.Nhanvien VALUES(   4,N'Lê Dũng',N'0122334455',N'',N'',3)
+GO
+INSERT INTO dbo.Nhanvien VALUES(   5,N'Trần Công Danh',N'0977665544',N'',N'',4)
+GO
+/*Nhập dữ liệu bảng dịch vụ*/
+
+INSERT INTO dbo.Dichvu VALUES(   001,N'ti vi',N'Ngày',100000.0,N'',0,100.0,7500000.0)
+GO
+INSERT INTO dbo.Dichvu VALUES(   002,N'Dầu gội',N'Gói',7500.0,N'',1,100.0,750000.0)
+GO
+INSERT INTO dbo.Dichvu VALUES(   003,N'Cafe',N'Ly',15000.0,N'',2,100.0,1500000.0)
+GO
+INSERT INTO dbo.Dichvu VALUES(   004,N'Giặt ủi',N'Ly',7500.0,N'',3,100.0,750000.0)
+GO
+
+/*Nhập dữ liệu bảng Khách Hàng*/
+INSERT INTO dbo.Khachhang VALUES(   1,N'Nguyễn Văn A',1,N'A',N'321654987', GETDATE(),N'Đà Nẵng',0,N'Việt Nam')
+GO
+INSERT INTO dbo.Khachhang VALUES(   2,N'Trần Thị B',1,N'A',N'36548954', GETDATE(),N'Đà Nẵng',1,N'Việt Nam')
+GO
+INSERT INTO dbo.Khachhang VALUES(   3,N'Nguyễn Văn A',1,N'A',N'321654987', GETDATE(),N'Đà Nẵng',2,N'Việt Nam')
+GO
+/*Nhập dữ liệu bảng Phòng*/
+INSERT INTO dbo.Phong VALUES(   N'101', 1, 1, 500000.0, 0, N'23456', 2, 4 )
+GO
+INSERT INTO dbo.Phong VALUES(   N'102', 1, 2, 1000000.0, 1, N'23456', 3, 6 )
+GO
+INSERT INTO dbo.Phong VALUES(   N'103', 1, 3, 1500000.0, 3, N'23456', 4, 8 )
+GO
+INSERT INTO dbo.Phong VALUES(   N'104', 1, 4, 0.0, 0, N'23456', 1, 4 )
+/*Nhập dữ liệu bảng TB_Phong*/
+
